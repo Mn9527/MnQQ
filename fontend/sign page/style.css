@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(120deg, #e0c3fc, #8ec5fc);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.form-box {
+    width: 100%;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    min-height: 450px; /* 确保表单盒子有足够的高度 */
+}
+
+.button-box {
+    width: 220px;
+    margin: 0 auto 30px;
+    position: relative;
+    box-shadow: 0 0 10px 1px #e0c3fc;
+    border-radius: 30px;
+}
+
+.toggle-btn {
+    padding: 10px 30px;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    outline: none;
+    position: relative;
+    font-weight: bold;
+}
+
+#btn {
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 110px;
+    height: 100%;
+    background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+    border-radius: 30px;
+    transition: 0.5s;
+}
+
+.input-group {
+    position: absolute;
+    width: calc(100% - 80px);
+    transition: 0.5s;
+    opacity: 0; /* 初始设置为不可见 */
+    pointer-events: none; /* 默认禁用鼠标事件 */
+    z-index: 1; /* 默认层级较低 */
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px 0;
+    margin: 5px 0;
+    border: none;
+    border-bottom: 1px solid #999;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+}
+
+.submit-btn {
+    width: 85%;
+    padding: 10px 30px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto 0;
+    background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+    border: 0;
+    outline: none;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#login-form {
+    left: 50px;
+    top: 120px;
+    opacity: 1; /* 默认显示登录表单 */
+    pointer-events: auto; /* 启用鼠标事件 */
+    z-index: 2; /* 确保在最上层 */
+}
+
+#register-form {
+    left: 50px; /* 初始位置与登录表单相同，但不可见 */
+    top: 100px;
+    opacity: 0;
+    pointer-events: none; /* 禁用鼠标事件 */
+    z-index: 1; /* 默认层级较低 */
+}
+
+.message {
+    text-align: center;
+    margin-top: 20px;
+    color: #333;
+    position: absolute;
+    width: calc(100% - 80px);
+    bottom: 20px;
+    left: 40px;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}

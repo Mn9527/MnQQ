@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MnQQ 好友</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- 添加 emoji 相关的 CSS -->
+    <link href="../lib/css/emoji.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f2f2f2; /* 整体背景色 */
+        }
+        
+        #sidebar {
+            width: 250px;
+            background-color: #e6edf7; /* 侧边栏背景色，浅蓝色 */
+            border-right: 1px solid #c0c0c0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* 添加阴影 */
+        }
+        
+        #search-container {
+            padding: 10px;
+            border-bottom: 1px solid #c0c0c0;
+            background-color: #e6edf7; /* 搜索框背景色与侧边栏一致 */
+        }
+        
+        #search-input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #a0a0a0; /* 边框颜色 */
+            border-radius: 5px; /* 圆角 */
+            background-color: #ffffff; /* 输入框背景色 */
+        }
+        
+        #tabs {
+            display: flex;
+            border-bottom: 1px solid #c0c0c0;
+            background-color: #e6edf7; /* 标签页背景色与侧边栏一致 */
+        }
+        
+        .tab {
+            padding: 12px 10px; /* 增加上下内边距 */
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            color: #333; /* 字体颜色 */
+            font-weight: bold; /* 字体加粗 */
+            transition: background-color 0.3s ease; /* 过渡效果 */
+        }
+        
+        .tab.active {
+            background-color: #d0e0f7; /* 选中标签页背景色 */
+            color: #000; /* 选中字体颜色 */
+            border-bottom: 3px solid #4a90e2; /* 选中下边框 */
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #f0f5fb; /* 鼠标悬停效果 */
+        }
+        
+        #friends-list, #requests-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .friend-item, .request-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .friend-item:hover, .request-item:hover {
+            background-color: #d0e0f7; /* 悬停背景色 */
+        }
+
+        .friend-item:last-child, .request-item:last-child {
+            border-bottom: none;
+        }
+        
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f2f2f2; /* 聊天区域背景色 */
+        }
+        
+        #chat-header {
+            padding: 15px 20px;
+            background-color: #f7f7f7; /* 聊天头部背景色 */
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 添加阴影 */
+        }
+        
+        #chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f2f2f2; /* 消息区域背景色 */
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 0;
+            max-width: 60%; /* 调整最大宽度 */
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            position: relative; /* 用于定位小箭头 */
+        }
+
+        .timestamp {
+            font-size: 0.75em;
+            color: #999;
+            margin-bottom: 5px;
+            padding: 0 5px;
+            text-align: center;
+        }
+
+        .sent-timestamp {
+            align-self: flex-end;
+            margin-right: 10px; /* 调整位置 */
+        }
+
+        .received-timestamp {
+            align-self: flex-start;
+            margin-left: 10px; /* 调整位置 */
+        }
+        
+        .message-content {
+            padding: 10px 15px; /* 消息内容内边距 */
+            border-radius: 15px; /* 更大的圆角 */
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background-color: #4a90e2; /* 发送消息的蓝色 */
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px; /* 靠近箭头的角变小 */
+        }
+        
+        .message.received .message-content {
+            background-color: #ffffff; /* 接收消息的白色 */
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px; /* 靠近箭头的角变小 */
+        }
+
+        /* 消息气泡小箭头 */
+        .message.sent .message-content::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid #4a90e2;
+        }
+
+        .message.received .message-content::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid #ffffff;
+        }
+        
+        #message-form {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #f7f7f7; /* 输入区域背景色 */
+            width: 100%; /* 占据整个底部栏 */
+            box-sizing: border-box; /* 包含 padding 在宽度内 */
+        }
+
+        #input-area {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .emoji-picker-container {
+            flex: 1;
+            position: relative;
+            margin-right: 10px;
+        }
+        
+        #message-input {
+    width: 100%; /* 恢复宽度 */
+    padding: 10px 15px; /* 调整内边距 */
+    border: 1px solid #c0c0c0;
+    border-radius: 20px;
+    background-color: #ffffff;
+    font-size: 1em;
+    line-height: 1.5;
+    outline: none;
+    resize: none;
+    height: 60px; /* 固定高度 */
+    overflow-y: auto;
+    box-sizing: border-box;
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    text-size-adjust: none;
+    max-height: 60px; /* 设置最大高度 */
+    min-height: 60px;
+}
+
+   
+
+        #send-button {
+            padding: 10px 20px;
+            background-color: #4a90e2; /* QQ蓝色 */
+            color: white;
+            border: none;
+            border-radius: 20px; /* 更大的圆角 */
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-icons-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 0; /* 调整左侧间距 */
+        }
+
+        #image-upload-container {
+            position: relative; /* 调整为相对定位 */
+            display: flex; /* 使用 flex 布局 */
+            align-items: center;
+        }
+
+        #imageButton {
+            background: none;
+            border: none;
+            font-size: 20px; /* 图标大小 */
+            color: #666; /* 图标颜色 */
+            cursor: pointer;
+            padding: 17px 5px;
+            transition: color 0.3s ease;
+        }
+
+        #imageButton:hover {
+            color: #4a90e2; /* 悬停颜色 */
+        }
+
+        #send-button:hover {
+            background-color: #3a7bd5;
+        }
+        
+        .request-buttons {
+            display: flex;
+            margin-top: 5px;
+        }
+        
+        .accept-btn, .reject-btn {
+            padding: 8px 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        
+        .accept-btn {
+            background-color: #4a90e2; /* QQ蓝色 */
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background-color: #3a7bd5;
+        }
+        
+        .reject-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        #search-results {
+            position: absolute;
+            top: 50px; /* 调整位置 */
+            left: 10px;
+            right: 10px;
+            background-color: #ffffff;
+            border: 1px solid #c0c0c0;
+            border-radius: 8px;
+            max-height: 250px; /* 调整最大高度 */
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 添加阴影 */
+        }
+        
+        .search-result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f0f5fb; /* 悬停背景色 */
+        }
+
+        /* 确保 emoji 按钮可见 */
+        .emoji-picker-container {
+            flex: 1;
+            position: relative;
+            margin-right: 10px;
+
+        }
+
+        .emoji-picker-container .emoji-button {
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            z-index: 2;
+            background: none;
+            border: none;
+            padding: 17px 5px;
+        }
+
+        /* 全局覆盖 emoji 菜单样式，使其向上并向左弹出 */
+        .emoji-menu {
+            bottom: 70px; /* 调整此值以控制向上弹出的距离，根据输入框高度和间距调整 */
+            left: auto; /* 移除 left 属性的影响 */
+            right: 0; /* 调整此值以控制向右弹出的距离，使其完全可见 */
+            z-index: 1000; /* 确保在其他元素之上 */
+        }
+
+        .emoji-picker-container .emoji-button:hover {
+            color: #4a90e2;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <div id="user-profile" style="padding: 10px; display: flex; align-items: center; border-bottom: 1px solid #ddd;">
+            <img id="user-avatar" src="" alt="User Avatar" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; background-color: #ccc;">
+            <span id="username-display" style="font-weight: bold;"></span>
+        </div>
+        <div id="search-container">
+            <input type="text" id="search-input" placeholder="搜索用户...">
+            <div id="search-results"></div>
+        </div>
+        <div id="tabs">
+            <div class="tab active" data-tab="friends">好友</div>
+            <div class="tab" data-tab="requests">请求</div>
+        </div>
+        <div id="friends-list"></div>
+        <div id="requests-list" style="display: none;"></div>
+    </div>
+    <div id="chat-container">
+        <div id="chat-header">选择一个好友开始聊天</div>
+        <div id="chat-messages"></div>
+        <form id="message-form">
+            <div id="input-area">
+                <div class="emoji-picker-container">
+                    <textarea id="message-input" data-emojiable="true"></textarea>
+                </div>
+                <div class="input-icons-container">
+                    <button type="button" id="imageButton" class="icon-button"><i class="fas fa-image"></i></button>
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                </div>
+                <button type="submit" id="send-button">发送</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 引入 Socket.IO 客户端库 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- 引入 jQuery 库 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- 添加 emoji 相关的 JavaScript -->
+    <script src="../lib/js/config.min.js"></script>
+    <script src="../lib/js/util.min.js"></script>
+    <script src="../lib/js/jquery.emojiarea.min.js"></script>
+    <script src="../lib/js/emoji-picker.min.js"></script>
+
+    <script>
+        $(function() {
+            // Initializes and creates emoji set from sprite sheet
+            window.emojiPicker = new EmojiPicker({
+                emojiable_selector: '[data-emojiable=true]',
+                assetsPath: '../lib/img/', // 确保这里的路径正确
+                popupButtonClasses: 'far fa-smile' // FontAwesome 5 的常规笑脸图标
+            });
+            // Finds all elements with `emojiable_selector` and converts them to rich emoji input fields
+            window.emojiPicker.discover();
+
+            // 调试：检查 emoji 按钮是否显示
+            setTimeout(function() {
+                const emojiButton = document.querySelector('.emoji-picker-container .emoji-button');
+                if (emojiButton) {
+                    console.log('Emoji button found:', emojiButton);
+                    console.log('Emoji button innerHTML:', emojiButton.innerHTML);
+                    console.log('Emoji button display style:', window.getComputedStyle(emojiButton).display);
+                    console.log('Emoji button visibility style:', window.getComputedStyle(emojiButton).visibility);
+                    console.log('Emoji button opacity style:', window.getComputedStyle(emojiButton).opacity);
+                } else {
+                    console.log('Emoji button not found.');
+                }
+            }, 1000);
+        });
+    </script>
+
+    <script src="friends.js"></script>
+</body>
+</html>
