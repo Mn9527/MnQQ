@@ -14,10 +14,10 @@ const { Server } = require('socket.io');
 
 // --- MySQL数据库连接配置 ---
 const dbConfig = {
-  host: 'localhost',
+  host: '127.0.0.1',
   user: 'root',
-  password: '123456',
-  database: 'MnQQ',
+  password: 'XxPb318H1pr1MYH1',
+  database: 'qq_db',
   port: 3306
 };
 
